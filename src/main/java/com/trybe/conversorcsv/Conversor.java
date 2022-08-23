@@ -1,8 +1,14 @@
 package com.trybe.conversorcsv;
 
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
+/** Classe conversor. */
 public class Conversor {
 
   /**
@@ -30,6 +36,75 @@ public class Conversor {
    *                     gravar os arquivos de saída.
    */
   public void converterPasta(File pastaDeEntradas, File pastaDeSaidas) throws IOException {
-    // TODO: Implementar.
+    final String tituloArquivo = "Nome completo,Data de nascimento,Email,CPF";
+    
+    for (int i = 0; i < pastaDeEntradas.list().length; i++) {
+      String entradaDiretorio = pastaDeEntradas.getPath()  + "/" + pastaDeEntradas.list()[i];
+      String saidaDiretorio = pastaDeSaidas.getPath() + "/"  + pastaDeEntradas.list()[i];
+      
+      File lerArquivoCsv = new File(entradaDiretorio);
+      FileReader lerArquivo = null;
+      BufferedReader buffArquivo = null;
+      FileWriter novoArquivo = null;
+      BufferedWriter buffEscreverArquivo = null;
+      
+      try {
+        if (lerArquivoCsv.canRead() && lerArquivoCsv.isFile()) {
+          lerArquivo = new FileReader(lerArquivoCsv);
+          buffArquivo = new BufferedReader(lerArquivo);
+        }
+        
+        File criaArquivo = new File(saidaDiretorio);
+        if (!criaArquivo.exists()) {
+          criaArquivo.createNewFile();
+        }
+        
+        novoArquivo = new FileWriter(criaArquivo);
+        buffEscreverArquivo = new BufferedWriter(novoArquivo);          
+
+        buffEscreverArquivo.write(tituloArquivo + '\n');
+        buffEscreverArquivo.flush();
+        
+        String lendoArquivo = buffArquivo.readLine();
+        while (lendoArquivo != null) {
+          if (!lendoArquivo.equals(tituloArquivo)) {
+            buffEscreverArquivo.write(formataLinha(lendoArquivo));
+          }
+          
+          lendoArquivo = buffArquivo.readLine();
+        }
+        
+      } catch (IOException e) {
+        e.printStackTrace();
+      
+      } finally {
+        buffEscreverArquivo.close();
+        buffArquivo.close();
+        
+      }
+    }
+    
+    
   }
+  
+  /** Formata Linha. */
+  public String formataLinha(String texto) {
+    if (texto.isEmpty()) {
+      return "";
+    }
+
+    String[] linhaParticionada = texto.split(",");
+    String[] dataFormatada = linhaParticionada[1].split("/");
+    String cpf = linhaParticionada[3].substring(0, 3) + '.'
+                        + linhaParticionada[3].substring(3, 6) + '.'
+                        + linhaParticionada[3].substring(6, 9) + '-'
+                        + linhaParticionada[3].substring(9, 11);
+        
+    String nome = linhaParticionada[0].toUpperCase();
+    String data = dataFormatada[2] + '-' + dataFormatada[1] + '-' + dataFormatada[0];
+    String email = linhaParticionada[2];
+    
+    return (nome + ',' + data + ',' + email + ',' + cpf + '\n');
+  }
+  
 }
