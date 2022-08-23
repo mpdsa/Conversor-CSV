@@ -37,6 +37,10 @@ public class Conversor {
   public void converterPasta(File pastaDeEntradas, File pastaDeSaidas) throws IOException {
     final String tituloArquivo = "Nome completo,Data de nascimento,Email,CPF";
     
+    if (!pastaDeSaidas.exists()) {
+      pastaDeSaidas.mkdir();
+    }
+    
     for (int i = 0; i < pastaDeEntradas.list().length; i++) {
       String entradaDiretorio = pastaDeEntradas.getPath()  + "/" + pastaDeEntradas.list()[i];
       String saidaDiretorio = pastaDeSaidas.getPath() + "/"  + pastaDeEntradas.list()[i];
